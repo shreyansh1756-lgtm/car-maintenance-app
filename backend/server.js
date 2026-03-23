@@ -7,7 +7,11 @@ app.use(cors());
 app.use(express.json());
 
 // 🔥 PASTE YOUR MONGODB URL HERE
-mongoose.connect("mongodb+srv://shreyansh1756_db_user:<db_password>@cluster0.ze11qd7.mongodb.net/?appName=Cluster0");
+mongoose.connect(
+  "mongodb+srv://shreyansh1756_db_user:abc123@cluster0.xxxx.mongodb.net/carDB?retryWrites=true&w=majority"
+)
+.then(() => console.log("MongoDB Connected ✅"))
+.catch(err => console.log("MongoDB Error ❌", err));
 
 const Vehicle = mongoose.model("Vehicle", {
   brand: String,
