@@ -8,7 +8,7 @@ app.use(express.json());
 
 // 🔥 PASTE YOUR MONGODB URL HERE
 mongoose.connect(
-  "mongodb+srv://shreyansh1756_db_user:abc123@cluster0.ze11qd7.mongodb.net/carDB?retryWrites=true&w=majority"
+  "mongodb+srv://shreyansh1756_db_user:aaabb@cluster0.ze11qd7.mongodb.net/carDB?retryWrites=true&w=majority"
 )
 .then(() => {
   console.log("MongoDB Connected ✅");
