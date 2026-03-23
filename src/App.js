@@ -11,8 +11,7 @@ import {
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
 
 function App() {
-  const API_URL = "https://car-maintenance-app.onrender.com";
-
+ const API_URL = "https://car-maintenance-app-ptbt.onrender.com";
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
   const [year, setYear] = useState("");
