@@ -8,8 +8,7 @@ app.use(express.json());
 
 // 🔥 PASTE YOUR MONGODB URL HERE
 mongoose.connect(
-  "mongodb+srv://shreyansh1756_db_user:abc123@cluster0.xxxx.mongodb.net/carDB?retryWrites=true&w=majority"
-)
+ " mongodb+srv://shreyansh1756_db_user:abc123@cluster0.ze11qd7.mongodb.net/?appName=Cluster0"
 .then(() => console.log("MongoDB Connected ✅"))
 .catch(err => console.log("MongoDB Error ❌", err));
 
