@@ -6,7 +6,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const db = new sqlite3.Database("./car.db");
+// 🔥 IMPORTANT: use /tmp for Render
+const db = new sqlite3.Database("/tmp/car.db");
 
 // Create tables
 db.serialize(() => {
@@ -46,7 +47,7 @@ db.serialize(() => {
   `);
 });
 
-// Test route
+// ✅ ROOT ROUTE (fixes "Cannot GET /")
 app.get("/", (req, res) => {
   res.send("Backend running 🚀");
 });
@@ -60,10 +61,18 @@ app.post("/addVehicle", (req, res) => {
      VALUES (?, ?, ?, ?)`,
     [brand, model, year, mileage],
     function (err) {
-      if (err) return res.send(err);
+      if (err) return res.status(500).send(err);
       res.send({ id: this.lastID });
     }
   );
+});
+
+// Get all vehicles
+app.get("/vehicles", (req, res) => {
+  db.all("SELECT * FROM vehicles", [], (err, rows) => {
+    if (err) return res.status(500).send(err);
+    res.send(rows);
+  });
 });
 
 // Add maintenance
@@ -75,13 +84,13 @@ app.post("/addMaintenance", (req, res) => {
      VALUES (?, ?, ?, ?)`,
     [vehicle_id, service_type, service_date, cost],
     function (err) {
-      if (err) return res.send(err);
+      if (err) return res.status(500).send(err);
       res.send({ id: this.lastID });
     }
   );
 });
 
-// Get maintenance
+// Get maintenance for a vehicle
 app.get("/maintenance/:vehicleId", (req, res) => {
   const { vehicleId } = req.params;
 
@@ -89,18 +98,10 @@ app.get("/maintenance/:vehicleId", (req, res) => {
     `SELECT * FROM maintenance WHERE vehicle_id = ?`,
     [vehicleId],
     (err, rows) => {
-      if (err) return res.send(err);
+      if (err) return res.status(500).send(err);
       res.send(rows);
     }
   );
-});
-
-// Get vehicles
-app.get("/vehicles", (req, res) => {
-  db.all("SELECT * FROM vehicles", [], (err, rows) => {
-    if (err) return res.send(err);
-    res.send(rows);
-  });
 });
 
 // Start server
@@ -109,5 +110,3 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log("Server running on port", PORT);
 });
-
-console.log("Starting server...");
