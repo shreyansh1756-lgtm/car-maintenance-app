@@ -7,7 +7,7 @@ app.use(cors());
 app.use(express.json());
 
 // 🔥 PASTE YOUR MONGODB URL HERE
-mongoose.connect("YOUR_MONGODB_URL");
+mongoose.connect("mongodb+srv://shreyansh1756_db_user:<db_password>@cluster0.ze11qd7.mongodb.net/?appName=Cluster0");
 
 const Vehicle = mongoose.model("Vehicle", {
   brand: String,
