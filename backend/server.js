@@ -10,7 +10,7 @@ app.use(express.json());
 mongoose.connect(
  " mongodb+srv://shreyansh1756_db_user:abc123@cluster0.ze11qd7.mongodb.net/?appName=Cluster0"
 .then(() => console.log("MongoDB Connected ✅"))
-.catch(err => console.log("MongoDB Error ❌", err));
+.catch(err => console.log("MongoDB Error ❌", err)));
 
 const Vehicle = mongoose.model("Vehicle", {
   brand: String,
