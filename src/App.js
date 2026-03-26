@@ -11,7 +11,8 @@ import {
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
 
 function App() {
- const API_URL = "https://car-maintenance-app-ptbt.onrender.com";
+  const API_URL = "https://car-maintenance-app-ptbt.onrender.com";
+
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
   const [year, setYear] = useState("");
@@ -37,11 +38,20 @@ function App() {
     fetchVehicles();
   }, []);
 
+  // Fetch maintenance when vehicle changes
+  useEffect(() => {
+    if (selectedVehicle) {
+      fetchMaintenance(selectedVehicle._id);
+    }
+  }, [selectedVehicle]);
+
   // Add vehicle
   const addVehicle = async () => {
     await fetch(`${API_URL}/addVehicle`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({ brand, model, year, mileage }),
     });
 
@@ -52,13 +62,44 @@ function App() {
     setMileage("");
   };
 
+  // Fetch maintenance
+  const fetchMaintenance = async (vehicleId) => {
+    const res = await fetch(`${API_URL}/maintenance/${vehicleId}`);
+    const data = await res.json();
+    setMaintenance(data);
+  };
+
+  // Add maintenance
+  const addMaintenance = async () => {
+    if (!selectedVehicle) return alert("Select vehicle first");
+
+    await fetch(`${API_URL}/addMaintenance`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        vehicle_id: selectedVehicle._id,
+        service_type: serviceType,
+        service_date: serviceDate,
+        cost,
+      }),
+    });
+
+    await fetchMaintenance(selectedVehicle._id);
+
+    setServiceType("");
+    setServiceDate("");
+    setCost("");
+  };
+
   // Due status
-  const getDueStatus = (serviceDate, serviceType) => {
+  const getDueStatus = (date, type) => {
     const today = new Date();
-    const lastDate = new Date(serviceDate);
+    const lastDate = new Date(date);
 
     let interval = 90;
-    if (serviceType === "Brake Check") interval = 180;
+    if (type === "Brake Check") interval = 180;
 
     const nextDate = new Date(lastDate);
     nextDate.setDate(nextDate.getDate() + interval);
@@ -83,35 +124,7 @@ function App() {
     return score < 0 ? 0 : score;
   };
 
-  // Fetch maintenance
-  const fetchMaintenance = async (vehicleId) => {
-    const res = await fetch(`${API_URL}/maintenance/${vehicleId}`);
-    const data = await res.json();
-    setMaintenance(data);
-  };
-
-  // Add maintenance
-  const addMaintenance = async () => {
-    if (!selectedVehicle) return alert("Select vehicle");
-
-    await fetch(`${API_URL}/addMaintenance`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        vehicle_id: selectedVehicle.id,
-        service_type: serviceType,
-        service_date: serviceDate,
-        cost,
-      }),
-    });
-
-    fetchMaintenance(selectedVehicle.id);
-    setServiceType("");
-    setServiceDate("");
-    setCost("");
-  };
-
-  // Chart Data
+  // Chart data
   const chartData = {
     labels: maintenance.map((m) => m.service_date),
     datasets: [
@@ -143,7 +156,6 @@ function App() {
     border: darkMode ? "1px solid #334155" : "1px solid #ccc",
     background: darkMode ? "#0f172a" : "#fff",
     color: darkMode ? "#fff" : "#000",
-    outline: "none",
   };
 
   const button = {
@@ -153,7 +165,7 @@ function App() {
     cursor: "pointer",
     marginTop: "8px",
     fontWeight: "bold",
-    background: darkMode ? "#22c55e" : "#16a34a",
+    background: "#22c55e",
     color: "#fff",
   };
 
@@ -172,17 +184,17 @@ function App() {
         Toggle {darkMode ? "Light" : "Dark"} Mode
       </button>
 
+      {/* Dashboard */}
       {selectedVehicle && (
         <div style={card}>
           <h2>Dashboard</h2>
           <p>🚘 {selectedVehicle.brand} {selectedVehicle.model}</p>
           <p>📊 Mileage: {selectedVehicle.mileage} km</p>
-          <p style={{ fontSize: "20px", fontWeight: "bold" }}>
-            ❤️ Health: {calculateHealth()}%
-          </p>
+          <p><b>❤️ Health: {calculateHealth()}%</b></p>
         </div>
       )}
 
+      {/* Add Vehicle */}
       <div style={card}>
         <h2>Add Vehicle</h2>
         <input style={input} placeholder="Brand" value={brand} onChange={(e) => setBrand(e.target.value)} />
@@ -192,15 +204,31 @@ function App() {
         <button style={button} onClick={addVehicle}>Add Vehicle</button>
       </div>
 
+      {/* Select Vehicle */}
       <div style={card}>
         <h2>Select Vehicle</h2>
         {vehicles.map((v) => (
-          <div key={v.id} onClick={() => { setSelectedVehicle(v); fetchMaintenance(v.id); }} style={{ cursor: "pointer" }}>
+          <div
+            key={v._id}
+            onClick={() => setSelectedVehicle(v)}
+            style={{
+              cursor: "pointer",
+              padding: "10px",
+              borderRadius: "8px",
+              marginBottom: "5px",
+              background:
+                selectedVehicle?._id === v._id
+                  ? "#22c55e"
+                  : darkMode ? "#1e293b" : "#e2e8f0",
+              color: "#fff",
+            }}
+          >
             🚘 {v.brand} {v.model}
           </div>
         ))}
       </div>
 
+      {/* Add Maintenance */}
       <div style={card}>
         <h2>Add Maintenance</h2>
         <input style={input} placeholder="Service Type" value={serviceType} onChange={(e) => setServiceType(e.target.value)} />
@@ -209,15 +237,17 @@ function App() {
         <button style={button} onClick={addMaintenance}>Add Service</button>
       </div>
 
+      {/* Chart */}
       <div style={card}>
         <h2>Maintenance Chart 📊</h2>
         <Line data={chartData} />
       </div>
 
+      {/* History */}
       <div style={card}>
         <h2>Maintenance History</h2>
         {maintenance.map((m) => (
-          <div key={m.id}>
+          <div key={m._id}>
             <b>{m.service_type}</b> — ₹{m.cost}
             <br />
             {m.service_date} — {getDueStatus(m.service_date, m.service_type)}

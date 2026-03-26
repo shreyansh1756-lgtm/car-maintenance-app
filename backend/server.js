@@ -6,7 +6,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 🔥 PASTE YOUR MONGODB URL HERE
+// ✅ MongoDB Connection
 mongoose.connect(
   "mongodb+srv://shreyansh1756_db_user:aaabb@cluster0.ze11qd7.mongodb.net/carDB?retryWrites=true&w=majority"
 )
@@ -17,6 +17,7 @@ mongoose.connect(
   console.log("MongoDB Error ❌", err);
 });
 
+// ✅ Vehicle Schema
 const Vehicle = mongoose.model("Vehicle", {
   brand: String,
   model: String,
@@ -24,46 +25,64 @@ const Vehicle = mongoose.model("Vehicle", {
   mileage: Number,
 });
 
+// ✅ Maintenance Schema
 const Maintenance = mongoose.model("Maintenance", {
-  vehicle_id: String,
+  vehicle_id: String,   // 🔥 correct field
   service_type: String,
   service_date: String,
   cost: Number,
 });
 
-// Root
+// ✅ Root Route
 app.get("/", (req, res) => {
   res.send("Backend running 🚀");
 });
 
-// Add vehicle
+// ✅ Add Vehicle
 app.post("/addVehicle", async (req, res) => {
-  const v = new Vehicle(req.body);
-  await v.save();
-  res.send(v);
+  try {
+    const v = new Vehicle(req.body);
+    await v.save();
+    res.send(v);
+  } catch (err) {
+    res.status(500).send(err);
+  }
 });
 
-// Get vehicles
+// ✅ Get Vehicles
 app.get("/vehicles", async (req, res) => {
-  const data = await Vehicle.find();
-  res.send(data);
+  try {
+    const data = await Vehicle.find();
+    res.send(data);
+  } catch (err) {
+    res.status(500).send(err);
+  }
 });
 
-// Add maintenance
+// ✅ Add Maintenance
 app.post("/addMaintenance", async (req, res) => {
-  const m = new Maintenance(req.body);
-  await m.save();
-  res.send(m);
+  try {
+    const m = new Maintenance(req.body);
+    await m.save();
+    res.send(m);
+  } catch (err) {
+    res.status(500).send(err);
+  }
 });
 
-// Get maintenance
+// ✅ Get Maintenance for Vehicle
 app.get("/maintenance/:vehicleId", async (req, res) => {
-  const data = await Maintenance.find({
-    vehicle_id: req.params.vehicleId,
-  });
-  res.send(data);
+  try {
+    const data = await Maintenance.find({
+      vehicle_id: req.params.vehicleId, // 🔥 correct
+    });
+    res.send(data);
+  } catch (err) {
+    res.status(500).send(err);
+  }
 });
 
+// ✅ Start Server
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
