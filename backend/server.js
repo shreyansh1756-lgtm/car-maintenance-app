@@ -1,4 +1,5 @@
 require("dotenv").config();
+const morgan = require("morgan")
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -6,6 +7,7 @@ const cors = require("cors");
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(morgan("dev"));
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected ✅"))
@@ -42,6 +44,7 @@ app.post("/addVehicle", async (req, res) => {
     res.status(500).send(err);
   }
 });
+app.get("/health", (req, res) => { res.json({ status: "ok", uptime: process.uptime() }); });
 
 // ✅ Get Vehicles
 app.get("/vehicles", async (req, res) => {
