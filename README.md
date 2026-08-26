@@ -25,25 +25,31 @@ A full-stack web application for tracking vehicles and their maintenance history
 - A MongoDB Atlas cluster (or any MongoDB connection string)
 
 ### Backend Setup
-cd backend
-npm install
-**
-Create a `.env` file inside `backend/` with:**
-MONGO_URI=your-mongodb-connection-string
-PORT=5000
+
+    cd backend
+    npm install
+
+Create a `.env` file inside `backend/` with:
+
+    MONGO_URI=your-mongodb-connection-string
+    PORT=5000
 
 Run the backend:
-npm start
+
+    npm start
 
 ### Frontend Setup
-npm install
-npm start
-Opens on [http://localhost:3000](http://localhost:3000)
+
+    npm install
+    npm start
+
+Opens on http://localhost:3000
 
 ### Running with Docker
-cd backend
-docker build -t car-maintenance-backend .
-docker run -p 5000:5000 --env-file .env car-maintenance-backend
+
+    cd backend
+    docker build -t car-maintenance-backend .
+    docker run -p 5000:5000 --env-file .env car-maintenance-backend
 
 ## API Endpoints
 
